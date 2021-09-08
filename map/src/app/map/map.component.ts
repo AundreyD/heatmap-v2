@@ -2,7 +2,8 @@ import { ApiService } from './../services/api.service';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet.heat/dist/leaflet-heat.js'
-import { addressPoints } from '../assets/realworld.1000'
+import { addressPoints } from '../assets/realworld.1000';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-map',
@@ -10,7 +11,7 @@ import { addressPoints } from '../assets/realworld.1000'
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  options = {
+  public options = {
     layers: [
       L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
@@ -20,22 +21,15 @@ export class MapComponent implements OnInit, AfterViewInit {
     zoom: 12,
     center: L.latLng(37.87, -78.9814)
   };
-
-  onMapReady(map: any) {
-    this.map = map
-    console.log('map', map)
-    let newAddressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
-    const heat = (L as any).heatLayer(newAddressPoints).addTo(map);
-  }
-
+  public searchType: boolean = false;
   private map: any;
-
-  private initMap(): void {
-    this.map =  L.map('map').setView([35.94, -78.9814], 12);
-  }
+  private heatLayer: any;
 
  
-  constructor(private apiService: ApiService) { }
+  constructor(
+    private apiService: ApiService,
+    private spinner: NgxSpinnerService
+    ) { }
 
   ngOnInit(): void {
   }
@@ -53,23 +47,33 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   }
 
-  log(event: any) {
+
+  public onMapReady(map: any) {
+    this.map = map
+    console.log('map', map)
+    let newAddressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
+    const heat = (L as any).heatLayer(newAddressPoints).addTo(map);
+  }
+
+  public log(event: any) {
+    this.spinner.show();
+    this.initMap();
     console.log('event', event)
-    console.log('pixel bounds', this.map.getPixelBounds());
     let bounds = this.map.getBounds();
-    console.log('bounds', bounds)
-    console.log('south', bounds.getSouth())
-    console.log('west', bounds.getWest())
-    console.log('East', bounds.getEast())
-    console.log('North', bounds.getNorth())
-    let ne = bounds._northEast;
-    let sw = bounds._southWest;
     let points: any;
-    this.apiService.getPoints(bounds.getEast().toFixed(2), bounds.getNorth().toFixed(2), bounds.getWest().toFixed(2), bounds.getSouth().toFixed(2)).subscribe( data => {
+    this.apiService.getPoints(bounds.getNorth().toFixed(2),bounds.getEast().toFixed(2), bounds.getSouth().toFixed(2), bounds.getWest().toFixed(2)).subscribe( data => {
       points = data;
       let newAddressPoints = points.map(function (p:any) { return [p['latitude'], p['longitude']]; });
-      const heat = (L as any).heatLayer(newAddressPoints).addTo(this.map);
+      this.heatLayer = (L as any).heatLayer(newAddressPoints).addTo(this.map);
+      this.spinner.hide()
     })
   }
 
+  public ipToggle() {
+    this.searchType = !this.searchType;
+  }
+
+  private initMap(lng?:number, lon?:number): void {
+    this.map =  L.map('map').setView([35.94, -78.9814], 12);
+  }
 }

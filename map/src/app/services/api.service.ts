@@ -10,12 +10,13 @@ export class ApiService {
 
   }
 
-   getPoints(neLat: any, neLong: any, swLat:any, swLong: any) {
+   getPoints(north: any, east: any, south:any, west: any, type: string = 'ipv4') {
     let params = new HttpParams()
-    .set('ne_lat', neLat)
-    .set('ne_long', neLong)
-    .set('sw_lat', swLat)
-    .set('sw_long', swLong)
+    .set('north', north)
+    .set('east', east)
+    .set('south', south)
+    .set('west', west)
+    .set('type', type)
 
     return this.http.get('http://127.0.0.1:5000/api/data',  {
       params: params
