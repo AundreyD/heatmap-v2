@@ -1,16 +1,20 @@
 import { ApiService } from './../services/api.service';
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import * as L from 'leaflet';
-import 'leaflet.heat/dist/leaflet-heat.js'
+import { Component, OnInit } from '@angular/core';
 import { addressPoints } from '../assets/realworld.1000';
 import { NgxSpinnerService } from "ngx-spinner";
+import * as L from 'leaflet';
+import 'leaflet.heat/dist/leaflet-heat.js'
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements OnInit {
+  public coords = {
+    latitude: 37.87,
+    longitude: -78.9814
+  }
   public options = {
     layers: [
       L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -19,7 +23,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       })
     ],
     zoom: 12,
-    center: L.latLng(37.87, -78.9814)
+    center: L.latLng(this.coords.latitude, this.coords.longitude)
   };
   public searchType: boolean = false;
   private map: any;
@@ -32,33 +36,20 @@ export class MapComponent implements OnInit, AfterViewInit {
     ) { }
 
   ngOnInit(): void {
+    window.navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+      this.coords = position.coords
+    })
   }
-
-  ngAfterViewInit(): void {
-    // this.initMap();
-    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      
-    //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    // }).addTo(this.map);
-    // let newAddressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
-    // addressPoints.map(function (p: any) { return [p[0], p[1]]; });
-
-    // (L as any).heatLayer(addressPoints).addTo(this.map);
-
-  }
-
 
   public onMapReady(map: any) {
     this.map = map
-    console.log('map', map)
     let newAddressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
     const heat = (L as any).heatLayer(newAddressPoints).addTo(map);
   }
 
-  public log(event: any) {
+  public addHeatMapLayer(event: any) {
     this.spinner.show();
-    this.initMap();
-    console.log('event', event)
+    if(this.heatLayer) { this.map.removeLayer(this.heatLayer)}
     let bounds = this.map.getBounds();
     let points: any;
     this.apiService.getPoints(bounds.getNorth().toFixed(2),bounds.getEast().toFixed(2), bounds.getSouth().toFixed(2), bounds.getWest().toFixed(2)).subscribe( data => {
@@ -73,6 +64,21 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.searchType = !this.searchType;
   }
 
+  public getPosition(event: any, options?: PositionOptions): void {
+    new Promise((resolve, reject) => 
+        navigator.geolocation.getCurrentPosition(resolve, reject, options)
+    )
+    .then(() => {
+      console.log('passed')
+      console.log('event', event)
+      this.onMapReady(event)
+    })
+    .catch(() =>{
+      console.log('caught');
+      this.onMapReady(event)
+    });
+  }
+  
   private initMap(lng?:number, lon?:number): void {
     this.map =  L.map('map').setView([35.94, -78.9814], 12);
   }

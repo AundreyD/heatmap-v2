@@ -9,7 +9,7 @@
 <div class="map-container" 
 leaflet
 [leafletOptions]="options" 
-(leafletMapReady)="onMapReady($event)"
-(leafletMapMoveEnd)="log($event)">
+(leafletMapReady)="getPosition($event)"
+(leafletMapMoveEnd)="addHeatMapLayer($event)">
 </div> 
 <ngx-spinner></ngx-spinner>
