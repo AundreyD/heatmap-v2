@@ -1,0 +1,2 @@
+cd map
+yarn build
