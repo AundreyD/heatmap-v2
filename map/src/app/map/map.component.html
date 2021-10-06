@@ -1,5 +1,37 @@
+<<<<<<< HEAD
 <div class="map-container">
     <div class="map-frame">
       <div id="map"></div>
     </div>
 </div>
+=======
+<div class="radio-container">
+  <form [formGroup]="form">
+    <div class="form-check form-check-inline">
+      <input 
+      class="form-check-input" 
+      type="radio" 
+      id="ipv4" value="ipv4" (click)="addHeatMapLayer()"
+      [attr.disabled]="form.get('ipType')?.value == 'ipv4' || null "
+      formControlName="ipType">
+      <label class="form-check-label" for="ipv4">IPV4</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio"
+         id="ipv6" 
+         value="ipv6" (click)="addHeatMapLayer()"
+         [attr.disabled]="form.get('ipType')?.value == 'ipv6' || null"
+         formControlName="ipType">
+        <label class="form-check-label" for="ipv6">IPV6</label>
+    </div>
+  </form>
+</div>
+
+<div class="map-container" 
+leaflet
+[leafletOptions]="options" 
+(leafletMapReady)="onMapReady($event)"
+(leafletMapMoveEnd)="addHeatMapLayer($event)">
+</div> 
+<ngx-spinner></ngx-spinner>
+>>>>>>> temp
