@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -12,17 +12,14 @@ import json
 import dask.dataframe as dd
 from helpers import validIPAddress
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../map/dist', static_url_path='/')
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sqlitedb.file"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = 0
 cors = CORS(app)
 dirname = os.path.dirname(__file__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 zf = ZipFile( os.path.join(dirname, 'csv.zip'))
-# ipv4_csv_file = os.path.join(dirname, 'GeoLite2-City-Blocks-IPv4.csv')
-# ipv6_csv_file = os.path.join(dirname, 'GeoLite2-City-Blocks-IPv6.csv')
+
 
 ipv4 = pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'), dtype={
     "network" : str,
@@ -56,12 +53,13 @@ ipv6 = ipv6.drop([ 'accuracy_radius','is_satellite_provider'
 ,'is_anonymous_proxy', 'represented_country_geoname_id',
 'registered_country_geoname_id', 'postal_code' ], axis=1)
 
-# full_ip = pd.concat([ipv4, ipv6])
-
+@app.route('/', methods=['GET'])
+def root():
+    return app.send_static_file('index.html') 
 
 @app.route('/api/data', methods=['Get'])
 @cross_origin()
-def test():
+def coords():
     args = request.args
     ip_type = args['type']
     north = args['north']
@@ -78,10 +76,7 @@ def test():
 
     return return_data.to_json(orient='records')
 
-# @app.route('/data', methods=['GET'])
-# @cross_origin()
-# def get():
-#     return json
+
 
 if __name__ == '__main__':
     app.run(debug=True)
