@@ -18,9 +18,7 @@ dirname = os.path.dirname(__file__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 zf = ZipFile( os.path.join(dirname, 'csv.zip'))
-
-
-ipv4 = pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=2000, dtype={
+dtype = {
     "network" : str,
     "geoname_id" : str,
     "registered_country_geoname_id" : str,
@@ -31,23 +29,15 @@ ipv4 = pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=2000, dtyp
     "latitude" : str,
     "longitude" : str,
     "accuracy_radius" : str,
-})
+}
+
+
+ipv4 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=5000, dtype=dtype)))
 ipv4 = ipv4.drop(['accuracy_radius','is_satellite_provider'
 ,'is_anonymous_proxy', 'represented_country_geoname_id',
 'registered_country_geoname_id', 'postal_code' ], axis=1)
-ipv6 = pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv6.csv'), chunksize=2000, dtype={
-    "network" : str,
-    "geoname_id" : str,
-    "registered_country_geoname_id" : str,
-    "represented_country_geoname_id" : str,
-    "is_anonymous_proxy" : str,
-    "is_satellite_provider" : str,
-    "postal_code" : str,
-    "latitude" : str,
-    "longitude" : str,
-    "accuracy_radius" : str,
-})
 
+ipv6 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv6.csv'),chunksize=5000, dtype=dtype)))
 ipv6 = ipv6.drop([ 'accuracy_radius','is_satellite_provider'
 ,'is_anonymous_proxy', 'represented_country_geoname_id',
 'registered_country_geoname_id', 'postal_code' ], axis=1)
