@@ -31,16 +31,18 @@ dtype = {
     "accuracy_radius" : str,
 }
 
+cols = ['network', 'geoname_id', 'latitude', 'longitude']
 
-ipv4 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=5000, dtype=dtype)))
-ipv4 = ipv4.drop(['accuracy_radius','is_satellite_provider'
-,'is_anonymous_proxy', 'represented_country_geoname_id',
-'registered_country_geoname_id', 'postal_code' ], axis=1)
 
-ipv6 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv6.csv'),chunksize=5000, dtype=dtype)))
-ipv6 = ipv6.drop([ 'accuracy_radius','is_satellite_provider'
-,'is_anonymous_proxy', 'represented_country_geoname_id',
-'registered_country_geoname_id', 'postal_code' ], axis=1)
+ipv4 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=5000, usecols=cols, low_memory=True)))
+# ipv4 = ipv4.drop(['accuracy_radius','is_satellite_provider'
+# ,'is_anonymous_proxy', 'represented_country_geoname_id',
+# 'registered_country_geoname_id', 'postal_code' ], axis=1)
+
+ipv6 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv6.csv'),chunksize=5000, usecols=cols, low_memory=True)))
+# ipv6 = ipv6.drop([ 'accuracy_radius','is_satellite_provider'
+# ,'is_anonymous_proxy', 'represented_country_geoname_id',
+# 'registered_country_geoname_id', 'postal_code' ], axis=1)
 
 @app.route('/', methods=['GET'])
 def root():
@@ -57,9 +59,9 @@ def coords():
     west = args['west']
 
     if(ip_type == 'ipv6'):
-        return_data = ipv6[(south <= ipv6['latitude']) & (north >=ipv6['latitude']) & (west >= ipv6['longitude']) & (east <= ipv6['longitude'])]
+        return_data = ipv6[(south <= ipv6['latitude'].astype(str)) & (north >=ipv6['latitude'].astype(str)) & (west >= ipv6['longitude'].astype(str)) & (east <= ipv6['longitude'].astype(str))]
     else:
-        return_data = ipv4[(south <= ipv4['latitude']) & (north >=ipv4['latitude']) & (west >= ipv4['longitude']) & (east <= ipv4['longitude'])]
+        return_data = ipv4[(south <= ipv4['latitude'].astype(str)) & (north >=ipv4['latitude'].astype(str)) & (west >= ipv4['longitude'].astype(str)) & (east <= ipv4['longitude'].astype(str))]
 
 
 
