@@ -6,7 +6,6 @@ charset-normalizer==2.0.6
 click==8.0.1
 Cython==0.29.24
 dask==2021.3.0
-dataclasses==0.8
 Deprecated==1.2.13
 Django==3.2.8
 entrypoints==0.3
