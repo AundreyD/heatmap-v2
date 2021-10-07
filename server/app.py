@@ -11,7 +11,7 @@ import pandas as pd
 import json
 import dask.dataframe as dd
 
-app = Flask(__name__, static_folder='../map/dist', static_url_path='/')
+app = Flask(__name__, static_folder='../map/dist/static', static_url_path='/')
 
 cors = CORS(app)
 dirname = os.path.dirname(__file__)
