@@ -20,18 +20,18 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 zf = ZipFile( os.path.join(dirname, 'csv.zip'))
 dtype = {
     "network" : str,
-    "geoname_id" : str,
+    "geoname_id" : int,
     "registered_country_geoname_id" : str,
     "represented_country_geoname_id" : str,
     "is_anonymous_proxy" : str,
     "is_satellite_provider" : str,
     "postal_code" : str,
-    "latitude" : str,
-    "longitude" : str,
+    "latitude" : float,
+    "longitude" : float,
     "accuracy_radius" : str,
 }
 
-cols = ['network', 'geoname_id', 'latitude', 'longitude']
+cols = ['geoname_id', 'latitude', 'longitude']
 
 
 ipv4 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-IPv4.csv'),chunksize=5000, usecols=cols, low_memory=True)))
