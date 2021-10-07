@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS, cross_origin
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -46,7 +46,7 @@ ipv6 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-I
 
 @app.route('/')
 def root():
-    return app.send_static_file('index.html') 
+    return send_from_directory(app.static_folder, 'index.html') 
 
 @app.route('/api/data', methods=['Get'])
 @cross_origin()
