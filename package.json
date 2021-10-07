@@ -1,6 +1,9 @@
 {
   "name": "map",
   "version": "0.0.0",
+  "engines": {
+    "node": "14.x.x"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
