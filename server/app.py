@@ -44,7 +44,7 @@ ipv6 = pd.concat((chunk for chunk in pd.read_csv(zf.open('GeoLite2-City-Blocks-I
 # ,'is_anonymous_proxy', 'represented_country_geoname_id',
 # 'registered_country_geoname_id', 'postal_code' ], axis=1)
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def root():
     return app.send_static_file('index.html') 
 
